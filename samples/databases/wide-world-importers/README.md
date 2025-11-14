@@ -1,5 +1,7 @@
 # WideWorldImporters Sample Database for SQL Server and Azure SQL Database
 
+(See Loading Instructions for what has worked for us)
+
 WideWorldImporters is a sample for SQL Server and Azure SQL Database. It showcases database design, as well as how to best leverage SQL Server features in a database.
 
 WideWorldImporters is a wholesale company. Transactions and real-time analytics are performed in the database WideWorldImporters. The database WideWorldImportersDW is an OLAP database, focused on analytics.
@@ -11,6 +13,47 @@ The sample includes the databases that can be explored, as well as sample applic
 **Documentation**: [Wide World Importers Documentation](http://go.microsoft.com/fwlink/?LinkID=800631)
 
 **Feedback on the sample**: send to [sqlserversamples@microsoft.com](mailto:sqlserversamples@microsoft.com)
+
+## Loading Instructions
+### Prerequsites
+- Visual Studio with SQL components
+- WSL2 + Docker setup
+- Install [SSIS Extension](https://marketplace.visualstudio.com/items?itemName=SSIS.MicrosoftDataToolsIntegrationServices) in Visual Studio, restart if needed
+
+### SQL Server Via WSL
+```bash
+export VOLUMEDIR=/home/kishan/dev/sqlserver/datavolume
+sudo rm -rf $VOLUMEDIR && mkdir -p $VOLUMEDIR
+sudo chown -R 10001:10001 $VOLUMEDIR
+sudo chmod -R 755 $VOLUMEDIR
+
+docker run -v /home/kishan/dev/sqlserver/datavolume:/var/opt/mssql -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=SecurePassword@33" -e "MSSQL_PID=Developer" -p 1433:1433  --name sqlpreview --hostname sqlpreview -d mcr.microsoft.com/mssql/server:2022-latest
+```
+
+For with password: `sqlcmd -U sa -P SecurePassword@33`
+For empty password `sqlcmd -U sa` and press enter on password prompt
+
+### Modifying Data Simulation
+
+Edit `Script.PostDeployment1.sql` to update the start and end date at dataloadsimulation procedure
+```sql
+EXEC DataLoadSimulation.DailyProcessToCreateHistory
+    @StartDate = '20130201',
+    @EndDate = '20130301',
+```
+
+### Run Instructions
+- Run the db creations (ww-ssdt and ww-dw-ssdt) first with password set. Clean / Build / Publish the Solution packages
+- Check that data is populated in WideWorldImporters and tables created in DW variant
+- Make password blank for ETL to run (not sure why connection managers fail to connect even after asking to save password)
+```sql
+ALTER LOGIN [sa] WITH CHECK_POLICY=OFF;
+GO
+ALTER LOGIN [sa] WITH PASSWORD='';
+GO
+```
+- Configure the Connection Managers with valid provider and blank password, choose one of the valid OLE DB Native providers and make sure to set credentials **and catalog**
+- Execute the `DailyETLMain.dtsx` from SSIS Packages in Daily ETL, once successfull should populate the data for 2013 feb based on data simulation range set (previous section)
 
 ### Contents
 
