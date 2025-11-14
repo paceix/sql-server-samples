@@ -33,6 +33,30 @@ docker run -v /home/kishan/dev/sqlserver/datavolume:/var/opt/mssql -e "ACCEPT_EU
 For with password: `sqlcmd -U sa -P SecurePassword@33`
 For empty password `sqlcmd -U sa` and press enter on password prompt
 
+For also loading adventure works
+```bash
+docker build -t mssql-with-fts .
+docker run -v /mnt/c/Users/kisha/windev/Power\ BI/sql-server-samples/:/sql-server-samples:ro -v /home/kishan/dev/sqlserver/datavolume:/var/opt/mssql -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=SecurePassword@33" -e "MSSQL_PID=Developer" -p 1433:1433  --name sqlpreview --hostname sqlpreview -d mssql-with-fts
+```
+NOTE: use below docker file only for load, it is not efficient, msqlserver is installed twice due to base image + apt. Figure out better solution if you need full text enabled docker image
+```Dockerfile
+FROM mcr.microsoft.com/mssql/server:2022-latest
+
+USER root
+
+# Install Full-Text Search
+RUN apt-get update -y && \
+    apt-get install -y curl gnupg2 && \
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg && \
+    curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/mssql-server-2022.list | tee /etc/apt/sources.list.d/mssql-server-2022.list && \
+    apt-get update -y && \
+    apt-get install -y mssql-server-fts && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+USER mssql
+```
+
 ### Modifying Data Simulation
 
 Edit `Script.PostDeployment1.sql` to update the start and end date at dataloadsimulation procedure
