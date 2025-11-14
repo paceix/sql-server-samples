@@ -1,5 +1,12 @@
 # Loading Instructions
 
+## Data Dump
+
+To take a dump or import, follow - https://learn.microsoft.com/en-us/sql/linux/sql-server-linux-migrate-ssms?view=sql-server-ver17
+
+We have checked in dump of all the databases in the repo as `Export.tar` at the root of repo. You can import the individual dbs directly into your SQL Server via SSMS and avoid the hassle of running things locally
+
+
 ### SQL Server Via WSL
 
 Prepare Data Dir
@@ -35,6 +42,16 @@ RUN apt-get update -y && \
 USER mssql
 ```
 
+To Change Password:
+```sql
+ALTER LOGIN [sa] WITH CHECK_POLICY=OFF;
+GO
+ALTER LOGIN [sa] WITH PASSWORD='';
+GO
+-- ALTER LOGIN [sa] WITH PASSWORD='SecurePassword@33';
+-- GO
+```
+
 Logging in:
 - For with password: `sqlcmd -U sa -P SecurePassword@33`
 - For empty password `sqlcmd -U sa` and press enter on password prompt
@@ -51,22 +68,17 @@ Logging in:
 
 ### Modifying Data Simulation
 
-Edit `Script.PostDeployment1.sql` to update the start and end date at dataloadsimulation procedure
+Edit `Script.PostDeployment1.sql` to update the start and end date at dataloadsimulation procedure invocation
 ```sql
 EXEC DataLoadSimulation.DailyProcessToCreateHistory
-    @StartDate = '20130201',
-    @EndDate = '20130301',
 ```
+(Search for KISHAN works too, left that as comment above this line)
+
+If less amount of data is fine, need fast generation, reduce endtime to one month, currently checked in to 1yr
 
 ### Run Instructions
 - Run the db creations (ww-ssdt and ww-dw-ssdt) first with password set. Clean / Build / Publish the Solution packages
 - Check that data is populated in WideWorldImporters and tables created in DW variant
 - Make password blank for ETL to run (not sure why connection managers fail to connect even after asking to save password)
-```sql
-ALTER LOGIN [sa] WITH CHECK_POLICY=OFF;
-GO
-ALTER LOGIN [sa] WITH PASSWORD='';
-GO
-```
 - Configure the Connection Managers with valid provider and blank password, choose one of the valid OLE DB Native providers and make sure to set credentials **and catalog**
 - Execute the `DailyETLMain.dtsx` from SSIS Packages in Daily ETL, once successfull should populate the data for 2013 feb based on data simulation range set (previous section)

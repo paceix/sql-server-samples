@@ -167,8 +167,8 @@ SET NOCOUNT ON;
 -- End   date <= 20171230 
 -- Haven't verified end date, but date range of 2020 jan is failing at ETL, some sql scripts have 2017 year is what we noticed
 EXEC DataLoadSimulation.DailyProcessToCreateHistory
-    @StartDate = '20130201',
-    @EndDate = '20130301',
+    @StartDate = '20130101',
+    @EndDate = '20140101',
     @AverageNumberOfCustomerOrdersPerDay = 30,
     @SaturdayPercentageOfNormalWorkDay = 25,
     @SundayPercentageOfNormalWorkDay = 0,
