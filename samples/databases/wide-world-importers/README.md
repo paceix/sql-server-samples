@@ -1,5 +1,7 @@
 # WideWorldImporters Sample Database for SQL Server and Azure SQL Database
 
+(See Loading Instructions for what has worked for us)
+
 WideWorldImporters is a sample for SQL Server and Azure SQL Database. It showcases database design, as well as how to best leverage SQL Server features in a database.
 
 WideWorldImporters is a wholesale company. Transactions and real-time analytics are performed in the database WideWorldImporters. The database WideWorldImportersDW is an OLAP database, focused on analytics.
@@ -11,6 +13,7 @@ The sample includes the databases that can be explored, as well as sample applic
 **Documentation**: [Wide World Importers Documentation](http://go.microsoft.com/fwlink/?LinkID=800631)
 
 **Feedback on the sample**: send to [sqlserversamples@microsoft.com](mailto:sqlserversamples@microsoft.com)
+
 
 ### Contents
 
